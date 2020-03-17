@@ -16,13 +16,9 @@ namespace FitOneVarRealFunc
         {
             try
             {
-                //TestOneSineCurve();
-                //TestTwoExpCurve();
+                TestOneSineCurve();
+                TestTwoExpCurve();
                 TestThreeSqrtAbsCurve();
-
-                /*
-                    https://chart-studio.plot.ly
-                */
                 return 0;
             }
             catch(Exception ex)
@@ -61,8 +57,12 @@ namespace FitOneVarRealFunc
             IEnumerable<XYItem> prediction = r.Predict(xvaluesTest);
 
             Console.Error.WriteLine("Saving");
-            ExportToCsvFile(dsTest, Path.Combine("out", "testds1.csv"));
-            ExportToCsvFile(prediction, Path.Combine("out", "prediction1.csv"));
+            string dstestFileName = Path.Combine("out", "testds1.csv");
+            string predictionFileName = Path.Combine("out", "prediction1.csv");
+            string octaveScriptFilename = Path.Combine("out", "octave1.m");
+            ExportToCsvFile(dsTest, dstestFileName);
+            ExportToCsvFile(prediction, predictionFileName);
+            GenerateOctaveScript(dstestFileName, predictionFileName, octaveScriptFilename);
             
             Console.Error.WriteLine("Terminated");
         }
@@ -87,8 +87,12 @@ namespace FitOneVarRealFunc
             IEnumerable<XYItem> prediction = r.Predict(xvaluesTest);
 
             Console.Error.WriteLine("Saving");
-            ExportToCsvFile(dsTest, Path.Combine("out", "testds2.csv"));
-            ExportToCsvFile(prediction, Path.Combine("out", "prediction2.csv"));
+            string dstestFileName = Path.Combine("out", "testds2.csv");
+            string predictionFileName = Path.Combine("out", "prediction2.csv");
+            string octaveScriptFilename = Path.Combine("out", "octave2.m");
+            ExportToCsvFile(dsTest, dstestFileName);
+            ExportToCsvFile(prediction, predictionFileName);
+            GenerateOctaveScript(dstestFileName, predictionFileName, octaveScriptFilename);
             
             Console.Error.WriteLine("Terminated");
         }
@@ -113,10 +117,31 @@ namespace FitOneVarRealFunc
             IEnumerable<XYItem> prediction = r.Predict(xvaluesTest);
 
             Console.Error.WriteLine("Saving");
-            ExportToCsvFile(dsTest, Path.Combine("out", "testds3.csv"));
-            ExportToCsvFile(prediction, Path.Combine("out", "prediction3.csv"));
-            
+            string dstestFileName = Path.Combine("out", "testds3.csv");
+            string predictionFileName = Path.Combine("out", "prediction3.csv");
+            string octaveScriptFilename = Path.Combine("out", "octave3.m");
+            ExportToCsvFile(dsTest, dstestFileName);
+            ExportToCsvFile(prediction, predictionFileName);
+            GenerateOctaveScript(dstestFileName, predictionFileName, octaveScriptFilename);
             Console.Error.WriteLine("Terminated");
+        }
+
+        private static void GenerateOctaveScript(string dstestFileName, string predictionFileName, string octaveScriptFilename)
+        {
+            string octaveScript = @$"testds=csvread('{Path.GetFileName(dstestFileName)}', 1, 0);
+
+coltest1 = testds(:, 1);
+coltest2 = testds(:, 2);
+
+prediction=csvread('{Path.GetFileName(predictionFileName)}', 1, 0);
+colpred1 = prediction(:, 1);
+colpred2 = prediction(:, 2);
+
+plot(coltest1, coltest2, 'linewidth', 2, colpred1, colpred2, 'linewidth', 2);
+
+pause;";
+
+        File.WriteAllText(octaveScriptFilename, octaveScript);
         }
    }
 }
