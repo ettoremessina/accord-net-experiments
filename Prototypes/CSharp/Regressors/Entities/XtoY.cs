@@ -1,9 +1,9 @@
 using System;
 using System.Globalization;
 
-namespace FitOneVarRealFunc.Entities
+namespace Regressors.Entities
 {
-    public class XYItem
+    public class XtoY
     {
         public double X {get; set;}
         public double Y { get; set; }
