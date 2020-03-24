@@ -14,15 +14,15 @@ namespace Regressors.Testers
     {
         public void RunTest()
         {
-            //Run(OneVarRealFuncSynthDataSetGenerator.GeneratePolynomialDS, -10, 10, 0.01, 0.045, 3, false, "PLSR_01_");
-            Run(OneVarRealFuncSynthDataSetGenerator.GenerateSineDS, -2 * Math.PI, 2 * Math.PI, 0.01, 0.045, 10, false, "PLSR_02_");
-            //Run(OneVarRealFuncSynthDataSetGenerator.GenerateExponentialDS, -5, 5, 0.01, 0.045, 10, false, "PLSR_03_");
-            //Run(OneVarRealFuncSynthDataSetGenerator.GenerateSqrtAbsDS, -5, 5, 0.01, 0.045, 20, false, "PLSR_04_");
-            //Run(OneVarRealFuncSynthDataSetGenerator.GenerateLog1PlusAbsDS, -5, 5, 0.01, 0.045, 16, false, "PLSR_07_");
-            //Run(OneVarRealFuncSynthDataSetGenerator.GenerateArcTanDS, -5, 5, 0.01, 0.045, 10, false, "PLSR_06_");
-            //Run(OneVarRealFuncSynthDataSetGenerator.GenerateExponentialSineDS, -2 * Math.PI, false, 2 * Math.PI, 0.01, 0.045, 14, "PLSR_07_");
-            //Run(OneVarRealFuncSynthDataSetGenerator.GenerateTanhDS, -5, 5, 0.01, 0.045, 4, false, "PLSR_08_");
-            //Run(OneVarRealFuncSynthDataSetGenerator.GenerateMuffleWavedDS, -20, 20, 0.01, 0.045, 40, false, "PLSR_09_");
+            Run(OneVarRealFuncSynthDataSetGenerator.GeneratePolynomialDS, -10, 10, 0.01, 0.045, 3, false, "PLSR_01");
+            Run(OneVarRealFuncSynthDataSetGenerator.GenerateSineDS, -2 * Math.PI, 2 * Math.PI, 0.01, 0.045, 10, false, "PLSR_02");
+            Run(OneVarRealFuncSynthDataSetGenerator.GenerateExponentialDS, -5, 5, 0.01, 0.045, 10, false, "PLSR_03");
+            Run(OneVarRealFuncSynthDataSetGenerator.GenerateSqrtAbsDS, -5, 5, 0.01, 0.045, 20, false, "PLSR_04");
+            Run(OneVarRealFuncSynthDataSetGenerator.GenerateLog1PlusAbsDS, -5, 5, 0.01, 0.045, 16, false, "PLSR_05");
+            Run(OneVarRealFuncSynthDataSetGenerator.GenerateArcTanDS, -5, 5, 0.01, 0.045, 10, false, "PLSR_06");
+            Run(OneVarRealFuncSynthDataSetGenerator.GenerateExponentialSineDS, -2 * Math.PI, 2 * Math.PI, 0.01, 0.045, 14, false, "PLSR_07");
+            Run(OneVarRealFuncSynthDataSetGenerator.GenerateTanhDS, -5, 5, 0.01, 0.045, 4, false, "PLSR_08");
+            Run(OneVarRealFuncSynthDataSetGenerator.GenerateMuffleWavedDS, -20, 20, 0.01, 0.045, 40, false, "PLSR_09");
         }
 
         private static void ExportToCsvFile(IEnumerable<XtoY> ds, string pathToFile)
@@ -56,9 +56,11 @@ set(gca, 'linewidth', 1.5, 'fontsize', 20)
             Func<double, double, double, IEnumerable<XtoY>> dsGenerator,
             double begin, double end, double learnDSStep, double testDSStep,
             int degree, bool isRobust,
-            string prefix
+            string subFolder
         )
         {
+            Console.Error.WriteLine($"Started test #{subFolder}");
+            
             Console.Error.WriteLine("Generating learning dataset");
             IList<XtoY> dsLearn = dsGenerator(begin, end, learnDSStep).ToList();
 
@@ -68,22 +70,28 @@ set(gca, 'linewidth', 1.5, 'fontsize', 20)
             PolynomialLeastSquares1to1Regressor r = new PolynomialLeastSquares1to1Regressor(degree, isRobust);
             Console.Error.WriteLine("Training");
             r.Learn(dsLearn);
-            Console.Error.WriteLine($"Learned polynomial {r.StringfyLearnedPolynomial()}");
+            Console.Out.WriteLine($"Learned polynomial {r.StringfyLearnedPolynomial()}");
 
-            Console.Error.WriteLine("Predicting");
+            Console.Out.WriteLine("Predicting");
             IEnumerable<double> xvaluesTest = dsTest.Select(i => i.X);
             IEnumerable<XtoY> prediction = r.Predict(xvaluesTest);
-            Console.Error.WriteLine($"Error: {r.ComputeError(dsTest, prediction)}");
+            Console.Out.WriteLine($"Error: {r.ComputeError(dsTest, prediction)}");
 
-            Console.Error.WriteLine("Saving");
-            string dstestFileName = Path.Combine("out", $"{prefix}testd.csv");
-            string predictionFileName = Path.Combine("out", $"{prefix}prediction.csv");
-            string octaveScriptFilename = Path.Combine("out", $"{prefix}octave.m");
-            ExportToCsvFile(dsTest, dstestFileName);
+            string targetDir = Path.Combine("out", subFolder);
+            if (!Directory.Exists(targetDir))
+                Directory.CreateDirectory(targetDir);
+            Console.Out.WriteLine($"Saving");
+            string dsLearnFileName = Path.Combine(targetDir, "learnds.csv");
+            string dsTestFileName = Path.Combine(targetDir, "testds.csv");
+            string predictionFileName = Path.Combine(targetDir, "prediction.csv");
+            string octaveScriptFilename = Path.Combine(targetDir, "octave.m");
+            ExportToCsvFile(dsLearn, dsLearnFileName);
+            ExportToCsvFile(dsTest, dsTestFileName);
             ExportToCsvFile(prediction, predictionFileName);
-            GenerateOctaveScript(dstestFileName, predictionFileName, octaveScriptFilename);
+            GenerateOctaveScript(dsTestFileName, predictionFileName, octaveScriptFilename);
             
-            Console.Error.WriteLine("Terminated");
+            Console.Error.WriteLine($"Terminated test #{subFolder}");
+            Console.Error.WriteLine();
         }
     }
 }
