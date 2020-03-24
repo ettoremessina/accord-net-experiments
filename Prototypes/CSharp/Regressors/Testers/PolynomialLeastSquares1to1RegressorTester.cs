@@ -84,7 +84,7 @@ set(gca, 'linewidth', 1.5, 'fontsize', 20)
             string dsLearnFileName = Path.Combine(targetDir, "learnds.csv");
             string dsTestFileName = Path.Combine(targetDir, "testds.csv");
             string predictionFileName = Path.Combine(targetDir, "prediction.csv");
-            string octaveScriptFilename = Path.Combine(targetDir, "octave.m");
+            string octaveScriptFilename = Path.Combine(targetDir, "plotgraph.m");
             ExportToCsvFile(dsLearn, dsLearnFileName);
             ExportToCsvFile(dsTest, dsTestFileName);
             ExportToCsvFile(prediction, predictionFileName);
