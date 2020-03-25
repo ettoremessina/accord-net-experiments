@@ -24,7 +24,7 @@ namespace Regressors.Wrappers
         {
             get
             {
-                EnsureAlreadyTrained();
+                AssertAlreadyLearned();
                 return _polynomialRegression.Weights;
             }
         }
@@ -33,11 +33,11 @@ namespace Regressors.Wrappers
         {
             get
             {
-                EnsureAlreadyTrained();
+                AssertAlreadyLearned();
                 return _polynomialRegression.Intercept;
             }
         }
-        private void EnsureAlreadyTrained()
+        private void AssertAlreadyLearned()
         {
             if (_polynomialRegression == null)
                 throw new NotTrainedException();
@@ -61,7 +61,7 @@ namespace Regressors.Wrappers
 
         public IEnumerable<XtoY> Predict(IEnumerable<double> xvalues)
         {
-            EnsureAlreadyTrained();
+            AssertAlreadyLearned();
 
             double []xvaluesArray = xvalues.ToArray();
             double [] yvaluesArray = _polynomialRegression.Transform(xvaluesArray);
@@ -71,7 +71,7 @@ namespace Regressors.Wrappers
             }
         }
 
-        public double ComputeError(IEnumerable<XtoY> ds, IEnumerable<XtoY> predicted)
+        public static double ComputeError(IEnumerable<XtoY> ds, IEnumerable<XtoY> predicted)
         {
             double [] outputs = ds.Select(i => i.Y).ToArray();
             double [] preds = predicted.Select(i => i.Y).ToArray();

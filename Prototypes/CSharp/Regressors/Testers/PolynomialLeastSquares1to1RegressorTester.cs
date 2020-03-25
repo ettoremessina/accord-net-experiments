@@ -75,7 +75,7 @@ set(gca, 'linewidth', 1.5, 'fontsize', 20)
             Console.Out.WriteLine("Predicting");
             IEnumerable<double> xvaluesTest = dsTest.Select(i => i.X);
             IEnumerable<XtoY> prediction = r.Predict(xvaluesTest);
-            Console.Out.WriteLine($"Error: {r.ComputeError(dsTest, prediction)}");
+            Console.Out.WriteLine($"Error: {PolynomialLeastSquares1to1Regressor.ComputeError(dsTest, prediction)}");
 
             string targetDir = Path.Combine("out", subFolder);
             if (!Directory.Exists(targetDir))
@@ -84,7 +84,7 @@ set(gca, 'linewidth', 1.5, 'fontsize', 20)
             string dsLearnFileName = Path.Combine(targetDir, "learnds.csv");
             string dsTestFileName = Path.Combine(targetDir, "testds.csv");
             string predictionFileName = Path.Combine(targetDir, "prediction.csv");
-            string octaveScriptFilename = Path.Combine(targetDir, "plotgraph.m");
+            string octaveScriptFilename = Path.Combine(targetDir, "octave.m");
             ExportToCsvFile(dsLearn, dsLearnFileName);
             ExportToCsvFile(dsTest, dsTestFileName);
             ExportToCsvFile(prediction, predictionFileName);
